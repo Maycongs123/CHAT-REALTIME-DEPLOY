@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "undefined/subscriptions/989b9d26-3c94-4e18-8c1e-f4fda86043b3/resourceGroups/chat-real-time-api/providers/Microsoft.Web/sites/chat-real-time-api",
+    "appService.deploySubpath": "."
+}

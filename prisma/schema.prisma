@@ -1,0 +1,115 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  // url      = env("DATABASE_URL")
+  url      = "mysql://dbadmin:Changge@2023@maycon-server.mysql.database.azure.com:3306/chat-database"
+}
+
+// 1 usuário pode se relacionar a N mensagens
+// N usuários podem se relacionar a N salas
+model User {
+  id                  Int                  @id @default(autoincrement())
+  name                String
+  email               String               @unique
+  password            String
+  imageURL            String?
+  status              UserStatus           @default(PENDING)
+  messages            Message[]
+  rooms               UserRoom[]
+  confirmCodes        ConfirmCode[]
+  ResetPasswordTokens ResetPasswordToken[]
+  createdAt           DateTime             @default(now())
+  updateAt            DateTime             @updatedAt
+
+  @@map("users")
+}
+
+model ConfirmCode {
+  id        Int               @id @default(autoincrement())
+  code      String
+  userId    Int
+  status    ConfirmCodeStatus @default(PENDING)
+  user      User              @relation(fields: [userId], references: [id])
+  createdAt DateTime          @default(now())
+  updateAt  DateTime          @updatedAt
+
+  @@map("confirm_code")
+}
+
+model ResetPasswordToken {
+  id        Int                      @id @default(autoincrement())
+  token     String
+  userId    Int
+  status    ResetPasswordTokenStatus @default(PENDING)
+  user      User                     @relation(fields: [userId], references: [id])
+  createdAt DateTime                 @default(now())
+  updateAt  DateTime                 @updatedAt
+
+  @@map("reset_password_code")
+}
+
+model UserRoom {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  roomId    Int
+  room      Room     @relation(fields: [roomId], references: [id])
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  @@map("users_rooms")
+}
+
+model Room {
+  id        Int        @id @default(autoincrement())
+  name      String
+  code      String     @unique
+  users     UserRoom[]
+  message   Message[]
+  createdAt DateTime   @default(now())
+  updateAt  DateTime   @updatedAt
+
+  @@map("rooms")
+}
+
+model Message {
+  id        Int      @id @default(autoincrement())
+  content   String
+  roomId    Int
+  room      Room     @relation(fields: [roomId], references: [id])
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updateAt  DateTime @updatedAt
+
+  @@map("messages")
+}
+
+enum ConfirmCodeStatus {
+  PENDING
+  USED
+  EXPIRED
+
+  @@map("confirm_code_status")
+}
+
+enum ResetPasswordTokenStatus {
+  PENDING
+  USED
+  EXPIRED
+
+  @@map("reset_password_token_status")
+}
+
+enum UserStatus {
+  PENDING
+  ACTIVE
+
+  @@map("user_status")
+}
