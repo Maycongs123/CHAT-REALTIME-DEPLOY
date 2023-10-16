@@ -10,7 +10,7 @@ const router = require('./routes');
 const authenticate = require('./middlewares/auth');
 const createSocketServer = require('./socket');
 
-const port = 8080 || 4000;
+const port =  process.env.PORT ||  8080 || 4000;
 const app = express();
 const server = http.createServer(app);
 
